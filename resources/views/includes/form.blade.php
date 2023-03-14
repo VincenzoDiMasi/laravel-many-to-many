@@ -29,10 +29,10 @@
             <input type="url" class="form-control" id="full_code" placeholder="Inserisci il link al progetto" name="project_link" value="{{old('project_link', $project->project_link)}}">
         </div>
 
-        <div class="col-6 mb-3">
+        {{-- <div class="col-6 mb-3">
             <label for="techonologies_used" class="form-label">Technlogies used </label>
             <input type="text" class="form-control" id="techonologies_used" placeholder="Inserisci le tecnologie utilizzate" name="techonologies_used" value="{{old('techonologies_used', $project->techonologies_used)}}" required>
-        </div>
+        </div> --}}
 
         <div class="col-4 mb-3">
             <label for="type_id" class="form-label">Type </label>

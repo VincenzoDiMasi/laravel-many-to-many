@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->text('description');
             $table->string('project_link');
-            $table->string('techonologies_used');
+            //  $table->string('techonologies_used');
             $table->timestamps();
         });
     }
