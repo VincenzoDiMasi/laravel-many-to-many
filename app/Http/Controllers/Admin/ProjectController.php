@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -31,10 +32,11 @@ class ProjectController extends Controller
     {
         //
         $project = new Project();
+        $technologies = Technology::select('id', 'name')->orderBy('id')->get();
         $types = Type::all();
 
 
-        return view('admin.projects.create', compact('project', 'types'));
+        return view('admin.projects.create', compact('project', 'types', 'technologies'));
     }
 
     /**
@@ -44,10 +46,10 @@ class ProjectController extends Controller
     {
         $request->validate([
             'title' => ['string', 'required', 'unique:projects', 'max:50'],
-            'image' => ['file', 'required'],
+            'image' => ['file', 'nullable'],
             'description' => ['string', 'required'],
             'project_link' => ['string', 'required', 'unique:projects',],
-            'techonologies_used' => ['string', 'required'],
+            'technologies' => ['nullable', 'exists:technologies,id'],
         ]);
 
         $data = $request->all();
@@ -62,6 +64,8 @@ class ProjectController extends Controller
         $project->fill($data);
 
         $project->save();
+
+        if (Arr::exists($data, 'technologies')) $project->technologies()->attach($data['technologies']);
 
         return to_route('admin.projects.index')->with('type', 'success')->with('msg', "Il Progetto $project->title è stato creato con successo.");
     }
@@ -83,7 +87,11 @@ class ProjectController extends Controller
         //
         $types = Type::all();
 
-        return view('admin.projects.edit', compact('project', 'types'));
+        $technologies = Technology::select('id', 'name')->orderBy('id')->get();
+
+        $project_technologies = $project->technologies->pluck('id')->toArray();
+
+        return view('admin.projects.edit', compact('project', 'types', 'technologies', 'project_technologies'));
     }
 
     /**
@@ -96,7 +104,7 @@ class ProjectController extends Controller
             'image' => ['file', 'required'],
             'description' => ['string', 'required'],
             'project_link' => ['string', 'required',],
-            'techonologies_used' => ['string', 'required'],
+            'technologies' => ['nullable', 'exists:technologies,id'],
         ]);
 
         $data = $request->all();
@@ -109,6 +117,9 @@ class ProjectController extends Controller
 
         $project->update($data);
 
+        if (Arr::exists($data, 'technologies')) $project->technologies()->sync($data['technologies']);
+        else $project->technologies()->detach();
+
         return redirect()->route('admin.projects.show', $project->id)->with('type', 'warning')->with('msg', "Il Progetto $project->title è stato modificato con successo.");
     }
     /**
@@ -117,6 +128,7 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         if ($project->image) Storage::delete($project->image);
+        if (count($project->technologies)) $project->technologies()->detach();
 
         $project->delete();
 

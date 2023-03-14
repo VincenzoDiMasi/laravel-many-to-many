@@ -43,6 +43,19 @@
                 @endforeach
             </select>
         </div>
+
+        <div class="technologies">
+            <h3 class="mt-3 mb-4">Tecnhologies used:</h3>
+
+            <div class="d-flex justify-content-between">
+                @foreach ($technologies as $technology)
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="tag-{{$technology->id}}" value="{{$technology->id}}" name="technologies[]" @checked(in_array($technology->id, old('technologies', $project_technologies ?? [])))>
+                        <label class="form-check-label" for="tag-{{$technology->id}}">{{$technology->name}}</label>
+                  </div>
+                @endforeach
+            </div>
+        </div>
 </div>
 
 <div class="buttons d-flex justify-content-between my-4">

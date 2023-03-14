@@ -20,7 +20,15 @@
               <h4 class="mb-3">Description:</h4>
               <p class="card-text">{{$project->description}}</p>
               <h4 class="mb-3">Technolgies:</h4>
-              <p class="card-text">{{$project->techonologies_used}}</p>
+              @forelse ($project->technologies as $technology)
+              <span>
+
+                  <span> {{$technology->name}}@if(!$loop->last), </span>
+                  @else.
+                @endif
+            @empty
+            -
+          @endforelse
               @if ($project->type)
               <h4 class="mb-3">Type:</h4>
               {{-- @dd($project) --}}
